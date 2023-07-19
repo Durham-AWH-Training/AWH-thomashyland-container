@@ -17,6 +17,8 @@ resources:
 - repo: self
 
 variables:
+  - group: awh_training_container_example
+
   - name: azureSubscription
     value: 'svc-con-awh-01'
   - name: dockerRegistryServiceConnection 
@@ -70,4 +72,7 @@ steps:
       DockerRepository: $(imageRepository)
       # commitHash defined in above script.
       DockerImageTag: $(tag)
-
+      AppSettings: >-
+        -DOCKER_REGISTRY_SERVER_USERNAME "$(DOCKER_REGISTRY_SERVER_USERNAME)"
+        -DOCKER_REGISTRY_SERVER_PASSWORD "$(DOCKER_REGISTRY_SERVER_PASSWORD)"
+        -DOCKER_REGISTRY_SERVER_URL "https://$(dockerRegistryServerURL)"
