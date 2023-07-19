@@ -15,8 +15,20 @@ resources:
 - repo: self
 
 variables:
+  - group: awh_training_container_example
+
   - name: azureSubscription
     value: 'svc-con-awh-01'
+  - name: dockerRegistryServiceConnection 
+    value: 'duuksawhacr01'
+  - name: dockerRegistryServerURL
+    value: 'duuksawhacr01.azurecr.io'
+  - name: dockerfilePath
+    value: '.'
+  - name: imageRepository
+    value: 'AWH-Training-Container-Example'
+  - name: tag
+    value: 'latest'
   - name: appName
     value: 'duuks-samanthafinnigan01' # Update this value.
   - name: appResourceGroupName
@@ -25,31 +37,33 @@ variables:
     value: 'PHP|7.4' # Update this value.
 
 steps:
-  - task: ArchiveFiles@2
-    displayName: "Archive Files"
+  - task: Docker@2
+    displayName: Login to ACR
     inputs:
-      rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
-      includeRootFolder: false
-      archiveType: "zip"
-      archiveFile: "$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip"
-      replaceExistingArchive: true
+      command: login
+      containerRegistry: $(dockerRegistryServiceConnection)
 
-  - task: AzureRmWebAppDeployment@4
+  # https://learn.microsoft.com/en-us/azure/devops/pipelines/apps/cd/deploy-docker-webapp
+  - task: Docker@2
+    displayName: Build and push an image to container registry
     inputs:
-      ConnectionType: 'AzureRM'
-      appType: 'webAppLinux'
+      command: buildAndPush
+      repository: $(imageRepository)
+      dockerfile: $(dockerfilePath)
+      containerRegistry: $(dockerRegistryServiceConnection)
+      tags: |
+        $(tag)
+
+  # https://learn.microsoft.com/en-us/azure/devops/pipelines/tasks/reference/azure-rm-web-app-deployment-v4
+  - task: AzureRmWebAppDeployment@4
+    displayName: Deploy Container to Web App
+    inputs:
+      appType: 'webAppContainer'
       deployToSlotOrASE: true
-      SlotName: 'production'
-      WebAppName: '$(appName)'
-      ResourceGroupName: '$(appResourceGroupName)'
       azureSubscription: '$(azureSubscription)'
-      RuntimeStack: '$(runtimeStack)'
-      packageForLinux: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
-      ScriptType: 'Inline Script'
-      InlineScript: |
-        set -e
-        export WORKDIR=$(pwd)
-        echo "Working directory is ${WORKDIR}"
-        
-        ls -lA | head
-        echo "$(ls -lA | wc -l) files total"
+      ResourceGroupName: '$(appResourceGroupName)'
+      WebAppName: '$(appName)'
+      DockerNamespace: $(dockerRegistryServerURL)
+      DockerRepository: $(imageRepository)
+      # commitHash defined in above script.
+      DockerImageTag: $(tag)
