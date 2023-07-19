@@ -1,7 +1,7 @@
-# Example PHP Deployment to AWH
+# Example Docker Deployment to AWH
 
 # Add steps that run tests, save build artifacts, deploy, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/php
+# https://learn.microsoft.com/en-gb/azure/devops/pipelines/ecosystems/containers/acr-template
 
 trigger:
 - main
@@ -30,11 +30,9 @@ variables:
   - name: tag
     value: 'latest'
   - name: appName
-    value: 'duuks-samanthafinnigan01' # Update this value.
+    value: 'duuksawhase-training-container01' # Update this value.
   - name: appResourceGroupName
     value: 'du-uks-awh-training' # Update this value.
-  - name: runtimeStack
-    value: 'PHP|7.4' # Update this value.
 
 steps:
   - task: Docker@2
@@ -67,3 +65,4 @@ steps:
       DockerRepository: $(imageRepository)
       # commitHash defined in above script.
       DockerImageTag: $(tag)
+
