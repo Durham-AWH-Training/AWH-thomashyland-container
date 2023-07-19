@@ -43,10 +43,6 @@ steps:
       command: login
       containerRegistry: $(dockerRegistryServiceConnection)
 
-  - script: "docker pull $(dockerRegistryServerURL)/$(imageRepository):latest"
-    displayName: Pull latest for layer caching
-    continueOnError: true # No cache will exist on first build
-
   # https://learn.microsoft.com/en-us/azure/devops/pipelines/apps/cd/deploy-docker-webapp
   - task: Docker@2
     displayName: Build and push an image to container registry
@@ -55,7 +51,6 @@ steps:
       repository: $(imageRepository)
       dockerfile: $(dockerfilePath)
       containerRegistry: $(dockerRegistryServiceConnection)
-      arguments: '--cache-from=$(dockerRegistryServerURL)/$(imageRepository):latest'
       tags: |
         $(tag)
 
