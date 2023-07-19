@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.4
 # Using https://github.com/docker/awesome-compose/tree/master/flask
-FROM --platform=$BUILDPLATFORM python:3.10-alpine AS builder
+FROM python:3.10-alpine
 
 WORKDIR /app
 
