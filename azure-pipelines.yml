@@ -26,7 +26,7 @@ variables:
   - name: dockerfilePath
     value: 'Dockerfile'
   - name: imageRepository
-    value: 'AWH-Training-Container-Example'
+    value: 'awh-training-container-example'
   - name: tag
     value: 'latest'
   - name: appName
