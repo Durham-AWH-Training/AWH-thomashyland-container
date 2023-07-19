@@ -15,8 +15,6 @@ resources:
 - repo: self
 
 variables:
-  - group: awh_training_container_example
-
   - name: azureSubscription
     value: 'svc-con-awh-01'
   - name: dockerRegistryServiceConnection 
